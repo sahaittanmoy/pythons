@@ -1,0 +1,50 @@
+#!python
+#Can be integrated with RightClick to Search inside files inside a directory
+import re
+import glob
+import os
+import mimetypes
+from termcolor import colored
+
+def get_word_cnt(p_filename, p_word):
+        try:
+                with open(p_filename,'r') as f:
+                        return len(re.findall(p_word, f.read(), re.IGNORECASE))
+        except:
+                return -1
+
+try:
+        sumfiles = ""
+        if os.name == 'nt':
+                dirname = os.getcwd() + "\\*.*"
+                splitchar = "\\"
+        else:
+                dirname = os.getcwd() + "/*.*"
+                splitchar= "/"
+                
+        print ("Search in " + dirname)
+        findword = input("Enter the Search string: ")
+        print
+        for i in glob.glob(dirname):
+                cntfound = get_word_cnt(i, findword)
+                if cntfound > -1:
+                        print ("Searching in file %s .......... Found %d occurance(s)." % (i.split(splitchar)[-1], cntfound))
+                else:
+                        print ("Searching in file %s .......... Skipped %s file." % (i.split(splitchar)[-1], mimetypes.guess_type(i)[0]))
+                if cntfound > 0:
+                        sumfiles += i + "\n"
+	
+        if len(sumfiles) > 0:
+                print ("\nSearch text is present in following files:\n" + sumfiles)
+        else:
+                print (colored("\nSearch text not found in any file.\n",'red'))
+	
+except IOError:
+	print ("Error: Unable to read files in mentioned path!")
+	raise
+except:
+	print ("Error: Unknown error occured!")
+	raise
+
+input("\nPress Enter to Exit...")
+quit()
